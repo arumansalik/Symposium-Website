@@ -1,203 +1,171 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
-import { useEventContext } from '../context/EventContext';
+import { useState } from "react";
+import Navbar from "../components/Layout/Navbar.jsx";
+import Footer from "../components/Layout/Footer.jsx";
+import { motion, AnimatePresence } from "framer-motion";
 
-const EventModal = ({ event, onClose }) => {
-    if (!event) return null;
+const technicalEvents = [
+    {
+        id: 1,
+        title: "Tech Quiz",
+        description: "Challenge yourself with mind-blowing tech questions.",
+        date: "April 12, 2025",
+        rules: [
+            "Each team can have a maximum of 2 members.",
+            "No internet or external help allowed.",
+            "Decisions of the judges are final."
+        ],
+        formLink: "https://forms.gle/sampleTech1"
+    },
+    {
+        id: 2,
+        title: "Paper Presentation",
+        description: "Showcase your research and innovative ideas.",
+        date: "April 13, 2025",
+        rules: [
+            "Each team can have a maximum of 2 members.",
+            "Time limit: 10 minutes presentation + 5 minutes Q&A.",
+            "Only original content is allowed."
+        ],
+        formLink: "https://forms.gle/sampleTech2"
+    },
+    {
+        id: 3,
+        title: "Paper Presentation",
+        description: "Showcase your research and innovative ideas.",
+        date: "April 13, 2025",
+        rules: [
+            "Each team can have a maximum of 2 members.",
+            "Time limit: 10 minutes presentation + 5 minutes Q&A.",
+            "Only original content is allowed."
+        ],
+        formLink: "https://forms.gle/sampleTech2"
+    }
+];
 
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-        >
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="bg-white rounded-xl p-8 max-w-md w-full relative"
-            >
-                <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-600 hover:text-red-500"
-                >
-                    ✕
-                </motion.button>
-                <h2 className="text-2xl font-bold mb-4 text-symposium-primary">
-                    {event.name}
-                </h2>
-                <div className="space-y-4 mb-6">
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-gray-700"
-                    >
-                        {event.description}
-                    </motion.p>
-                    <div className="grid grid-cols-2 gap-4">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 }}
-                        >
-                            <strong>Date:</strong> {event.date}
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.4 }}
-                        >
-                            <strong>Time:</strong> {event.time}
-                        </motion.div>
-                    </div>
-                </div>
-                <Link
-                    to={`/events/${event.id}`}
-                    className="w-full block text-center bg-symposium-secondary text-white py-3 rounded-lg hover:bg-green-600 transition"
-                >
-                    View Full Details
-                </Link>
-            </motion.div>
-        </motion.div>
-    );
-};
+const nonTechnicalEvents = [
+    {
+        id: 4,
+        title: "Treasure Hunt",
+        description: "Solve clues, find the treasure, and claim your prize!",
+        date: "April 14, 2025",
+        rules: [
+            "Teams of 3-4 members.",
+            "Follow the given path and clues.",
+            "No external help allowed."
+        ],
+        formLink: "https://forms.gle/sampleNonTech1"
+    },
+    {
+        id: 5,
+        title: "Gaming Arena",
+        description: "Compete in exciting console and PC gaming battles.",
+        date: "April 15, 2025",
+        rules: [
+            "Single-player and multiplayer formats available.",
+            "Specific game rules will be explained before the match.",
+            "Fair play is mandatory."
+        ],
+        formLink: "https://forms.gle/sampleNonTech2"
+    }
+];
 
 const Events = () => {
-    const { events = [], selectedEvent, setSelectedEvent } = useEventContext();
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                delayChildren: 0.3,
-                staggerChildren: 0.2
-            }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                type: "spring",
-                stiffness: 300,
-                damping: 20
-            }
-        }
-    };
-
-    // Defensive check for events
-    const filteredEvents = events.filter(event =>
-        event &&
-        typeof event === 'object' &&
-        event.id &&
-        event.name &&
-        event.description
-    );
-
-    // Fallback UI if no events
-    if (filteredEvents.length === 0) {
-        return (
-            <div className="bg-symposium-background min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold text-symposium-primary mb-4">
-                        No Events Available
-                    </h2>
-                    <p className="text-gray-600">
-                        Check back later for upcoming events.
-                    </p>
-                </div>
-            </div>
-        );
-    }
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     return (
-        <div className="bg-symposium-background min-h-screen">
+        <div className="min-h-screen bg-black text-white font-sans relative overflow-hidden">
             <Navbar />
+            <div className="absolute inset-0 bg-[radial-gradient(circle,#3a0ca3,#000000)] opacity-75"></div>
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="container mx-auto px-4 py-16"
-            >
-                <motion.h1
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                    className="text-4xl font-bold text-center mb-12 text-symposium-primary"
-                >
-                    Symposium Events
-                </motion.h1>
+            <div className="container mx-auto px-6 py-24 text-center relative z-10">
+                <h1 className="text-6xl font-extrabold text-purple-400 mb-6 tracking-wide">
+                    🔥 EVENTS & COMPETITIONS 🔥
+                </h1>
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-12">
+                    Explore thrilling tech & non-tech events, participate, and win exciting prizes!
+                </p>
 
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="grid md:grid-cols-3 gap-8"
-                >
-                    {filteredEvents.map((event) => (
+                {/* Technical Events */}
+                <section>
+                    <h2 className="text-4xl font-bold text-indigo-500 mb-6">⚙️ Technical Events</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {technicalEvents.map(event => (
+                            <motion.div
+                                key={event.id}
+                                className="glass-card p-8 rounded-xl shadow-lg cursor-pointer bg-gradient-to-br from-purple-800 to-indigo-900 hover:scale-105 transition-transform duration-300"
+                                onClick={() => setSelectedEvent(event)}
+                            >
+                                <h2 className="text-3xl font-bold text-white">{event.title}</h2>
+                                <p className="text-gray-300 mt-2">{event.description}</p>
+                                <p className="text-gray-400 mt-2 text-sm">{event.date}</p>
+                                <button className="mt-4 px-6 py-2 bg-indigo-500 text-white rounded-full shadow-lg hover:bg-indigo-600 transition">
+                                    View Details
+                                </button>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Non-Technical Events */}
+                <section className="mt-16">
+                    <h2 className="text-4xl font-bold text-yellow-500 mb-6">🎭 Non-Technical Events</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {nonTechnicalEvents.map(event => (
+                            <motion.div
+                                key={event.id}
+                                className="glass-card p-8 rounded-xl shadow-lg cursor-pointer bg-gradient-to-br from-yellow-500 to-orange-700 hover:scale-105 transition-transform duration-300"
+                                onClick={() => setSelectedEvent(event)}
+                            >
+                                <h2 className="text-3xl font-bold text-white">{event.title}</h2>
+                                <p className="text-gray-300 mt-2">{event.description}</p>
+                                <p className="text-gray-400 mt-2 text-sm">{event.date}</p>
+                                <button className="mt-4 px-6 py-2 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition">
+                                    View Details
+                                </button>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+            </div>
+
+            {/* Event Details Modal */}
+            <AnimatePresence>
+                {selectedEvent && (
+                    <motion.div
+                        className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
                         <motion.div
-                            key={event.id}
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-white rounded-xl shadow-lg overflow-hidden"
+                            className="bg-gray-900 p-8 rounded-xl shadow-lg text-center max-w-3xl flex flex-col md:flex-row"
+                            initial={{ scale: 0.8 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.8 }}
                         >
-                            <div className="p-6">
-                                <h3 className="text-xl font-bold mb-4 text-symposium-primary">
-                                    {event.name}
-                                </h3>
-                                <p className="text-gray-600 mb-4">
-                                    {(event.description || '').substring(0, 100)}...
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-500">
-                                        {event.date || 'Date TBA'}
-                                    </span>
-                                    <div className="flex space-x-2">
-                                        <motion.button
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
-                                            onClick={() => setSelectedEvent(event)}
-                                            className="px-4 py-2 bg-symposium-secondary text-white rounded-lg hover:bg-green-600 transition"
-                                        >
-                                            Quick View
-                                        </motion.button>
-                                        <Link
-                                            to={`/events/${event.id}`}
-                                            className="px-4 py-2 bg-symposium-primary text-white rounded-lg hover:bg-blue-700 transition"
-                                        >
-                                            Details
-                                        </Link>
-                                    </div>
-                                </div>
+                            <div className="w-full md:w-2/3 text-left">
+                                <h2 className="text-3xl font-bold text-purple-400">{selectedEvent.title}</h2>
+                                <p className="text-gray-300 mt-4">{selectedEvent.description}</p>
+                                <p className="text-gray-400 mt-2 text-sm">{selectedEvent.date}</p>
+                                <h3 className="text-lg font-semibold text-yellow-400 mt-4">Rules & Regulations:</h3>
+                                <ul className="list-disc list-inside text-gray-300">
+                                    {selectedEvent.rules.map((rule, index) => (
+                                        <li key={index}>{rule}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="w-full md:w-1/3 flex flex-col justify-center items-center mt-6 md:mt-0">
+                                <a href={selectedEvent.formLink} target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition text-lg">
+                                    Register Now
+                                </a>
+                                <button className="mt-4 text-gray-400 hover:text-white transition" onClick={() => setSelectedEvent(null)}>
+                                    Close
+                                </button>
                             </div>
                         </motion.div>
-                    ))}
-                </motion.div>
-
-                <AnimatePresence>
-                    {selectedEvent && (
-                        <EventModal
-                            event={selectedEvent}
-                            onClose={() => setSelectedEvent(null)}
-                        />
-                    )}
-                </AnimatePresence>
-            </motion.div>
-
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <Footer />
         </div>
     );

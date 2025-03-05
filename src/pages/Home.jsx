@@ -32,7 +32,19 @@ const Home = () => {
         return () => clearInterval(countdown);
     }, []);
 
-
+    // useEffect(() => {
+    //     gsap.from(".hero-text", { opacity: 0, y: -30, duration: 1.2, ease: "power2.out" });
+    //     gsap.from(".countdown-card", { opacity: 0, scale: 0.8, duration: 1.2, delay: 0.5, ease: "elastic.out(1,0.5)", stagger: 0.3 });
+    //     gsap.from(".register-btn", { opacity: 0, y: 20, duration: 1, delay: 1, ease: "back.out(1.7)" });
+    //     gsap.from(".scroll-section", {
+    //         scrollTrigger: { trigger: ".scroll-section", start: "top 80%", toggleActions: "play none none none" },
+    //         opacity: 0,
+    //         y: 30,
+    //         duration: 1.2,
+    //         stagger: 0.3,
+    //         ease: "power3.out",
+    //     });
+    // }, []);
 
     return (
         <div className="relative min-h-screen bg-black text-white flex flex-col items-center text-center p-6 overflow-hidden font-sans">
