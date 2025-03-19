@@ -1,103 +1,92 @@
-import { useEffect, useState } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Layout/Navbar.jsx";
 import Footer from "../components/Layout/Footer.jsx";
+import { motion } from "framer-motion";
 
-gsap.registerPlugin(ScrollTrigger);
+// Countdown Timer Logic
+const calculateTimeLeft = () => {
+    const eventDate = new Date("2025-04-10T00:00:00").getTime();
+    const now = new Date().getTime();
+    const difference = eventDate - now;
+
+    let timeLeft = {};
+    if (difference > 0) {
+        timeLeft = {
+            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+            minutes: Math.floor((difference / (1000 * 60)) % 60),
+            seconds: Math.floor((difference / 1000) % 60),
+        };
+    }
+    return timeLeft;
+};
 
 const Home = () => {
-    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
     useEffect(() => {
-        const eventDate = new Date("2025-03-27T00:00:00").getTime();
-
-        const countdown = setInterval(() => {
-            const now = new Date().getTime();
-            const difference = eventDate - now;
-
-            if (difference <= 0) {
-                clearInterval(countdown);
-                return;
-            }
-
-            setTimeLeft({
-                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-                minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-                seconds: Math.floor((difference % (1000 * 60)) / 1000),
-            });
+        const timer = setInterval(() => {
+            setTimeLeft(calculateTimeLeft());
         }, 1000);
-
-        return () => clearInterval(countdown);
+        return () => clearInterval(timer);
     }, []);
 
-    // useEffect(() => {
-    //     gsap.from(".hero-text", { opacity: 0, y: -30, duration: 1.2, ease: "power2.out" });
-    //     gsap.from(".countdown-card", { opacity: 0, scale: 0.8, duration: 1.2, delay: 0.5, ease: "elastic.out(1,0.5)", stagger: 0.3 });
-    //     gsap.from(".register-btn", { opacity: 0, y: 20, duration: 1, delay: 1, ease: "back.out(1.7)" });
-    //     gsap.from(".scroll-section", {
-    //         scrollTrigger: { trigger: ".scroll-section", start: "top 80%", toggleActions: "play none none none" },
-    //         opacity: 0,
-    //         y: 30,
-    //         duration: 1.2,
-    //         stagger: 0.3,
-    //         ease: "power3.out",
-    //     });
-    // }, []);
-
     return (
-        <div className="relative min-h-screen bg-black text-white flex flex-col items-center text-center p-6 overflow-hidden font-sans">
+        <div className="min-h-screen bg-black text-white font-sans">
             <Navbar />
 
-            {/* Background Effect */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle,#3a0ca3,#000000)] opacity-75"></div>
+            {/* Hero Section with Video Background */}
+            <section className="relative h-screen flex flex-col justify-center items-center text-center px-6">
 
-            {/* Hero Section */}
-            <div className="z-10 mt-24">
-                <h1 className="hero-text text-6xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-purple-400 to-indigo-600 text-transparent bg-clip-text">
-                    SANSCINCO 2025
-                </h1>
-                <p className="hero-text text-lg md:text-xl mb-6 max-w-3xl mx-auto opacity-80 text-gray-300">
-                    Experience the fusion of technology, innovation, and creativity at our annual college symposium. Participate and win exciting rewards!
-                </p>
-                <button className="register-btn px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-lg font-bold rounded-full shadow-lg hover:scale-110 transition-transform">
-                    Register Now →
-                </button>
-            </div>
+                {/* Background Video */}
+                <video
+                    className="absolute top-0 left-0 w-full h-full object-cover"
+                    src="/videos/bg.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                ></video>
+
+                {/* Dark Overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-70"></div>
+
+                {/* Hero Content */}
+                <motion.div
+                    className="relative z-10"
+                    initial={{ opacity: 0, y: -50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1 }}
+                >
+                    <h1 className="text-6xl md:text-7xl font-extrabold text-white mb-6 tracking-wide">
+                        🚀 Welcome to <span className="text-purple-400">Our College Symposium!</span>
+                    </h1>
+                    <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+                        Join us for an incredible journey of knowledge, innovation, and fun! Participate in exciting events and win amazing prizes.
+                    </p>
+
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        className="relative px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-lg font-bold rounded-full shadow-lg hover:scale-110 transition-transform"
+                    >
+                        <a href="/events">Explore Events</a>
+                    </motion.button>
+                </motion.div>
+            </section>
 
             {/* Countdown Timer */}
-            <div className="mt-16 z-10">
-                <h2 className="text-3xl font-semibold text-gray-200">COUNTDOWN TO THE EVENT</h2>
-                <div className="flex justify-center mt-6 space-x-4 text-4xl font-bold">
-                    {["DAYS", "HOURS", "MINUTES", "SECONDS"].map((label, index) => (
-                        <div key={index} className="countdown-card bg-gradient-to-r from-indigo-500 to-purple-700 px-6 py-4 rounded-xl shadow-md text-center">
-                            <span>{Object.values(timeLeft)[index]}</span>
-                            <span className="text-sm block text-gray-300">{label}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Event Highlights */}
-            <div className="scroll-section mt-24 z-10 max-w-5xl mx-auto px-4">
-                <h2 className="text-4xl font-bold text-gray-100">Why Attend?</h2>
-                <p className="text-gray-300 mt-2 max-w-xl mx-auto">
-                    Explore cutting-edge technology, compete in exciting challenges, and network with industry leaders.
+            <section className="py-24 px-6 text-center">
+                <h2 className="text-5xl font-bold text-green-500 mb-6">⏳ Countdown to the Event</h2>
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
+                    The symposium is just around the corner! Get ready to participate in exciting events.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                    {[
-                        { title: "Tech Talks", desc: "Engaging sessions from industry experts." },
-                        { title: "Competitions", desc: "Showcase your skills and win prizes." },
-                        { title: "Workshops", desc: "Hands-on experience with real-world applications." }
-                    ].map((item, index) => (
-                        <div key={index} className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-700 hover:scale-105 transition">
-                            <h3 className="text-xl font-semibold text-purple-400">{item.title}</h3>
-                            <p className="text-gray-300 mt-2">{item.desc}</p>
-                        </div>
-                    ))}
+                <div className="flex justify-center gap-4 text-4xl font-extrabold text-white">
+                    <div className="p-4 bg-gray-900 rounded-lg shadow-lg">{timeLeft.days}d</div>
+                    <div className="p-4 bg-gray-900 rounded-lg shadow-lg">{timeLeft.hours}h</div>
+                    <div className="p-4 bg-gray-900 rounded-lg shadow-lg">{timeLeft.minutes}m</div>
+                    <div className="p-4 bg-gray-900 rounded-lg shadow-lg">{timeLeft.seconds}s</div>
                 </div>
-            </div>
+            </section>
 
             <Footer />
         </div>
